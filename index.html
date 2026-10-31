@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Campus Complaints</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FBF8FF; --card:#FFFFFF; --ink:#2E2A47; --mute:#7A7596; --line:#ECE7F7;
+  --lav:#DCD6F7; --mint:#CDEFE0; --peach:#FFD9C9; --sky:#CFE6F7; --butter:#FFF0BF; --rose:#F9D2E0;
+  --lav-d:#6C5FC7; --mint-d:#2F8F6B; --peach-d:#C4622D; --sky-d:#2F7BB0; --butter-d:#9A7A0B; --rose-d:#B8447A;
+  --r:18px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font-family:"DM Sans",system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5}
+h1,h2,h3{font-family:"Bricolage Grotesque","DM Sans",sans-serif;margin:0;letter-spacing:-.01em}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--lav-d);outline-offset:2px}
+.hidden{display:none!important}
+
+/* auth */
+.auth{min-height:100%;display:grid;grid-template-columns:1.1fr 1fr}
+.hero{background:linear-gradient(160deg,var(--lav),var(--sky) 55%,var(--mint));padding:56px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden}
+.hero h1{font-size:clamp(34px,4.4vw,56px);line-height:1.05;max-width:11ch}
+.hero p{max-width:38ch;font-size:18px;color:#46416a}
+.blob{position:absolute;border-radius:50%;filter:blur(2px);opacity:.75}
+.b1{width:220px;height:220px;background:var(--peach);right:-60px;top:12%}
+.b2{width:140px;height:140px;background:var(--butter);right:18%;bottom:-40px}
+.b3{width:90px;height:90px;background:var(--rose);left:46%;top:8%}
+.hero>*{position:relative;z-index:1}
+.roles{display:flex;gap:10px;flex-wrap:wrap}
+.chip{padding:6px 14px;border-radius:999px;font-weight:700;font-size:14px;background:#ffffffaa}
+.formside{display:flex;align-items:center;justify-content:center;padding:32px}
+.panel{width:100%;max-width:400px}
+.tabs{display:flex;background:var(--line);border-radius:999px;padding:4px;margin:18px 0 22px}
+.tabs button{flex:1;border:0;background:none;padding:9px;border-radius:999px;cursor:pointer;font-weight:700;color:var(--mute)}
+.tabs button.on{background:#fff;color:var(--ink);box-shadow:0 2px 8px #6c5fc71f}
+label{display:block;font-weight:700;font-size:14px;margin:14px 0 6px}
+input,select,textarea{width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:14px;background:#fff}
+textarea{min-height:110px;resize:vertical}
+input:focus,select:focus,textarea:focus{border-color:var(--lav-d);outline:none}
+.btn{border:0;border-radius:14px;padding:12px 18px;font-weight:700;cursor:pointer;background:var(--lav-d);color:#fff;transition:transform .12s}
+.btn:hover{transform:translateY(-1px)}
+.btn.soft{background:var(--lav);color:var(--lav-d)}
+.btn.mint{background:var(--mint);color:var(--mint-d)}
+.btn.full{width:100%;margin-top:20px}
+.btn:disabled{opacity:.5;cursor:default;transform:none}
+.err{color:var(--rose-d);background:var(--rose);padding:10px 14px;border-radius:12px;margin-top:14px;font-size:14px}
+.demo{margin-top:24px;font-size:13px;color:var(--mute)}
+.demo button{border:0;border-radius:999px;padding:5px 12px;margin:4px 4px 0 0;cursor:pointer;font-weight:700;font-size:13px}
+
+/* app shell */
+.app{display:grid;grid-template-columns:250px 1fr;min-height:100%}
+aside{background:#fff;border-right:1.5px solid var(--line);padding:24px 18px;display:flex;flex-direction:column;gap:6px;position:sticky;top:0;height:100vh}
+.brand{font-family:"Bricolage Grotesque";font-weight:700;font-size:21px;margin:0 8px 18px}
+.brand span{display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--lav-d);margin-right:8px}
+.nav{border:0;background:none;text-align:left;padding:11px 14px;border-radius:14px;cursor:pointer;font-weight:700;color:var(--mute)}
+.nav:hover{background:var(--bg)}
+.nav.on{background:var(--lav);color:var(--lav-d)}
+.who{margin-top:auto;padding:14px;border-radius:16px;background:var(--bg)}
+.who b{display:block}
+.rolebadge{display:inline-block;margin-top:6px;padding:3px 12px;border-radius:999px;font-size:13px;font-weight:700}
+.rb-admin{background:var(--rose);color:var(--rose-d)}.rb-faculty{background:var(--sky);color:var(--sky-d)}.rb-student{background:var(--mint);color:var(--mint-d)}
+.linkbtn{background:none;border:0;color:var(--mute);cursor:pointer;margin-top:8px;padding:0;text-decoration:underline}
+main{padding:34px clamp(18px,4vw,48px);max-width:1150px;width:100%}
+main h2{font-size:30px;margin-bottom:4px}
+.sub{color:var(--mute);margin:0 0 24px}
+.grid{display:grid;gap:16px}
+.tiles{grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}
+.tile{border-radius:var(--r);padding:20px}
+.tile b{font-family:"Bricolage Grotesque";font-size:38px;display:block;line-height:1.1}
+.tile small{font-weight:700}
+.card{background:var(--card);border:1.5px solid var(--line);border-radius:var(--r);padding:22px}
+.two{grid-template-columns:repeat(auto-fit,minmax(300px,1fr));margin-top:16px}
+.bar{display:grid;grid-template-columns:130px 1fr 28px;gap:10px;align-items:center;margin:10px 0;font-size:14px}
+.bar i{display:block;height:12px;border-radius:99px;background:var(--lav-d)}
+.bar div{background:var(--line);border-radius:99px;overflow:hidden}
+.filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}
+.filters select{width:auto;min-width:150px}
+.list{display:grid;gap:12px}
+.row{display:grid;grid-template-columns:1fr auto;gap:8px 16px;align-items:center;background:#fff;border:1.5px solid var(--line);border-radius:var(--r);padding:16px 20px;cursor:pointer;text-align:left;width:100%;transition:border-color .12s,transform .12s}
+.row:hover{border-color:var(--lav-d);transform:translateY(-1px)}
+.row h3{font-size:17px}
+.meta{color:var(--mute);font-size:13px;grid-column:1}
+.tags{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.tag{padding:3px 11px;border-radius:999px;font-size:12.5px;font-weight:700;white-space:nowrap}
+.s-Open{background:var(--butter);color:var(--butter-d)}.s-Assigned{background:var(--sky);color:var(--sky-d)}
+.s-In\ Progress{background:var(--peach);color:var(--peach-d)}.s-Resolved{background:var(--mint);color:var(--mint-d)}.s-Closed{background:var(--line);color:var(--mute)}
+.p-Low{background:var(--mint);color:var(--mint-d)}.p-Medium{background:var(--butter);color:var(--butter-d)}.p-High{background:var(--peach);color:var(--peach-d)}.p-Critical{background:var(--rose);color:var(--rose-d)}
+.cat{background:var(--lav);color:var(--lav-d)}
+.empty{text-align:center;padding:44px 20px;color:var(--mute);background:#fff;border:1.5px dashed var(--lav);border-radius:var(--r)}
+.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
+.suggest{background:var(--butter);border-radius:14px;padding:12px 16px;margin-top:16px;font-size:14px}
+.suggest .tags{justify-content:flex-start;margin-top:6px}
+
+/* drawer */
+.scrim{position:fixed;inset:0;background:#2e2a4755;display:flex;justify-content:flex-end;z-index:10}
+.drawer{background:var(--bg);width:min(560px,100%);height:100%;overflow:auto;padding:28px;animation:slide .22s ease-out}
+@keyframes slide{from{transform:translateX(40px);opacity:0}to{transform:none;opacity:1}}
+.drawer h2{font-size:26px;margin:10px 0}
+.close{float:right;border:0;background:#fff;border-radius:50%;width:36px;height:36px;cursor:pointer;font-size:18px}
+.kv{display:grid;grid-template-columns:110px 1fr;gap:6px 12px;font-size:14px;margin:16px 0}
+.kv dt{color:var(--mute)}.kv dd{margin:0;font-weight:500}
+.timeline{border-left:3px solid var(--lav);margin:12px 0 0 6px;padding-left:18px}
+.timeline div{margin-bottom:16px;position:relative;font-size:14px}
+.timeline div::before{content:"";position:absolute;left:-26px;top:5px;width:11px;height:11px;border-radius:50%;background:var(--lav-d);border:3px solid var(--bg)}
+.actions{margin-top:20px;display:grid;gap:12px}
+.actions .card{padding:16px}
+.actions h3{font-size:16px;margin-bottom:6px}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:12px 22px;border-radius:999px;z-index:20;font-weight:700}
+@media(max-width:820px){
+  .auth{grid-template-columns:1fr}.hero{padding:32px;min-height:260px}.hero h1{font-size:34px}
+  .app{grid-template-columns:1fr}
+  aside{position:static;height:auto;flex-direction:row;flex-wrap:wrap;align-items:center;padding:12px}
+  .brand{width:100%;margin:0 0 6px}.who{margin:0;flex:1 1 100%}
+  .formgrid{grid-template-columns:1fr}.bar{grid-template-columns:100px 1fr 24px}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<!-- AUTH -->
+<section id="auth" class="auth hidden">
+  <div class="hero">
+    <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+    <div class="brand" style="margin:0"><span></span>Campus Complaints</div>
+    <div>
+      <h1>Report it. Track it. Get it fixed.</h1>
+      <p>Raise a problem with a classroom, hostel, lab or service, then follow it until it is resolved.</p>
+    </div>
+    <div class="roles"><span class="chip">Students</span><span class="chip">Faculty</span><span class="chip">Admin</span></div>
+  </div>
+  <div class="formside"><div class="panel">
+    <h2 id="authTitle">Welcome back</h2>
+    <div class="tabs" role="tablist">
+      <button class="on" id="tabIn" type="button">Sign in</button>
+      <button id="tabUp" type="button">Create account</button>
+    </div>
+    <form id="authForm">
+      <div id="nameWrap" class="hidden">
+        <label for="aName">Full name</label><input id="aName" autocomplete="name">
+        <label for="aRole">I am a</label>
+        <select id="aRole"><option value="student">Student</option><option value="faculty">Faculty member</option></select>
+      </div>
+      <label for="aEmail">Email</label><input id="aEmail" type="email" required autocomplete="email">
+      <label for="aPass">Password</label><input id="aPass" type="password" required minlength="6" autocomplete="current-password">
+      <div id="authErr" class="err hidden"></div>
+      <button class="btn full" id="authBtn">Sign in</button>
+    </form>
+    <div class="demo">Try a demo account:<br>
+      <button style="background:var(--mint);color:var(--mint-d)" data-d="student@campus.edu|student123">Student</button>
+      <button style="background:var(--sky);color:var(--sky-d)" data-d="faculty@campus.edu|faculty123">Faculty</button>
+      <button style="background:var(--rose);color:var(--rose-d)" data-d="admin@campus.edu|admin123">Admin</button>
+    </div>
+  </div></div>
+</section>
+
+<!-- APP -->
+<section id="app" class="app hidden">
+  <aside>
+    <div class="brand"><span></span>Campus Complaints</div>
+    <div id="nav" style="display:contents"></div>
+    <div class="who">
+      <b id="whoName"></b><span id="whoRole" class="rolebadge"></span><br>
+      <button class="linkbtn" id="logout">Sign out</button>
+    </div>
+  </aside>
+  <main id="main"></main>
+</section>
+
+<div id="drawerHost"></div>
+<div id="toast" class="toast hidden"></div>
+
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+let token = localStorage.getItem("cc_token"), user = null, meta = null, view = "";
+
+async function api(path, opts = {}) {
+  const r = await fetch("/api" + path, {
+    method: opts.method || "GET",
+    headers: {"Content-Type": "application/json", ...(token ? {Authorization: "Bearer " + token} : {})},
+    body: opts.body ? JSON.stringify(opts.body) : undefined
+  });
+  const data = await r.json().catch(() => ({}));
+  if (!r.ok) {
+    if (r.status === 401 && token) { logout(); }
+    const d = data.detail;
+    throw new Error(Array.isArray(d) ? d.map(x => x.loc.slice(-1)[0] + ": " + x.msg).join("; ") : (d || "Something went wrong"));
+  }
+  return data;
+}
+function toast(msg) { const t = $("#toast"); t.textContent = msg; t.classList.remove("hidden"); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.add("hidden"), 2400); }
+const fmt = d => new Date(d + "Z").toLocaleString([], {day: "numeric", month: "short", hour: "2-digit", minute: "2-digit"});
+const tag = (cls, txt) => `<span class="tag ${cls}">${esc(txt)}</span>`;
+
+/* ---------- auth ---------- */
+let mode = "in";
+function setMode(m) {
+  mode = m;
+  $("#tabIn").classList.toggle("on", m === "in"); $("#tabUp").classList.toggle("on", m === "up");
+  $("#nameWrap").classList.toggle("hidden", m === "in");
+  $("#authBtn").textContent = m === "in" ? "Sign in" : "Create account";
+  $("#authTitle").textContent = m === "in" ? "Welcome back" : "Join your campus";
+  $("#authErr").classList.add("hidden");
+}
+$("#tabIn").onclick = () => setMode("in"); $("#tabUp").onclick = () => setMode("up");
+document.querySelectorAll("[data-d]").forEach(b => b.onclick = () => {
+  const [e, p] = b.dataset.d.split("|"); setMode("in"); $("#aEmail").value = e; $("#aPass").value = p;
+});
+$("#authForm").onsubmit = async e => {
+  e.preventDefault(); $("#authErr").classList.add("hidden");
+  try {
+    const body = {email: $("#aEmail").value, password: $("#aPass").value};
+    if (mode === "up") { body.name = $("#aName").value; body.role = $("#aRole").value; }
+    const r = await api(mode === "in" ? "/login" : "/register", {method: "POST", body});
+    token = r.token; localStorage.setItem("cc_token", token); await boot();
+  } catch (err) { $("#authErr").textContent = err.message; $("#authErr").classList.remove("hidden"); }
+};
+function logout() { token = null; user = null; localStorage.removeItem("cc_token"); $("#app").classList.add("hidden"); $("#auth").classList.remove("hidden"); }
+$("#logout").onclick = logout;
+
+/* ---------- shell ---------- */
+async function boot() {
+  try {
+    if (!token) throw 0;
+    user = await api("/me"); meta = await api("/meta");
+  } catch { return logout(); }
+  $("#auth").classList.add("hidden"); $("#app").classList.remove("hidden");
+  $("#whoName").textContent = user.name;
+  $("#whoRole").textContent = user.role[0].toUpperCase() + user.role.slice(1);
+  $("#whoRole").className = "rolebadge rb-" + user.role;
+  const items = {
+    student: [["mine", "My complaints"], ["new", "New complaint"]],
+    faculty: [["assigned", "Assigned to me"], ["mine", "My complaints"], ["new", "New complaint"]],
+    admin: [["dash", "Dashboard"], ["all", "All complaints"]]
+  }[user.role];
+  $("#nav").innerHTML = items.map(([k, l]) => `<button class="nav" data-v="${k}">${l}</button>`).join("");
+  document.querySelectorAll(".nav").forEach(b => b.onclick = () => go(b.dataset.v));
+  go(items[0][0]);
+}
+function go(v) {
+  view = v;
+  document.querySelectorAll(".nav").forEach(b => b.classList.toggle("on", b.dataset.v === v));
+  ({dash: dashboard, all: listView, mine: listView, assigned: listView, new: newForm})[v]();
+}
+
+/* ---------- lists ---------- */
+function rowHtml(c) {
+  return `<button class="row" data-id="${c.id}">
+    <div><h3>${esc(c.title)}</h3></div>
+    <div class="tags">${tag("cat", c.category)}${tag("p-" + c.priority, c.priority)}${tag("s-" + c.status, c.status)}</div>
+    <div class="meta">#${c.id} · ${esc(c.location || "No location")} · by ${esc(c.created_by)} · ${fmt(c.created_at)}${c.assigned_to ? " · with " + esc(c.assigned_to) : ""}</div>
+  </button>`;
+}
+async function listView() {
+  const titles = {all: ["All complaints", "Everything reported across the campus."],
+    mine: ["My complaints", "Complaints you have filed."], assigned: ["Assigned to me", "Complaints the admin has given you to resolve."]};
+  const [t, s] = titles[view];
+  const opts = (arr, ph) => `<option value="">${ph}</option>` + arr.map(x => `<option>${esc(x)}</option>`).join("");
+  $("#main").innerHTML = `<h2>${t}</h2><p class="sub">${s}</p>
+    <div class="filters">
+      <select id="fS">${opts(meta.statuses, "Any status")}</select>
+      <select id="fP">${opts(meta.priorities, "Any priority")}</select>
+      <select id="fC">${opts(meta.categories, "Any category")}</select>
+    </div><div id="list" class="list"></div>`;
+  const load = async () => {
+    const q = new URLSearchParams({status: $("#fS").value, priority: $("#fP").value, category: $("#fC").value, scope: view === "assigned" ? "assigned" : "mine"});
+    [...q].forEach(([k, v]) => !v && q.delete(k));
+    const items = await api("/complaints?" + q);
+    $("#list").innerHTML = items.length ? items.map(rowHtml).join("")
+      : `<div class="empty">Nothing here yet.${view === "mine" && user.role !== "admin" ? " Use “New complaint” to report an issue." : ""}</div>`;
+    document.querySelectorAll(".row").forEach(r => r.onclick = () => openDrawer(r.dataset.id, load));
+  };
+  ["#fS", "#fP", "#fC"].forEach(s => $(s).onchange = load);
+  load();
+}
+
+/* ---------- new complaint ---------- */
+function newForm() {
+  $("#main").innerHTML = `<h2>New complaint</h2><p class="sub">Describe the problem. We suggest a category and priority as you type.</p>
+  <form id="cf" class="card" style="max-width:720px">
+    <label for="cT" style="margin-top:0">Title</label><input id="cT" required minlength="4" placeholder="e.g. Tap leaking in Hostel B washroom">
+    <label for="cD">What is wrong?</label><textarea id="cD" required minlength="10" placeholder="Where, since when, and how it affects you"></textarea>
+    <label for="cL">Location</label><input id="cL" placeholder="Block, floor or room">
+    <div id="sg" class="suggest hidden"></div>
+    <div class="formgrid">
+      <div><label for="cC">Category</label><select id="cC"><option value="">Use suggestion</option>${meta.categories.map(x => `<option>${x}</option>`).join("")}</select></div>
+      <div><label for="cP">Priority</label><select id="cP"><option value="">Use suggestion</option>${meta.priorities.map(x => `<option>${x}</option>`).join("")}</select></div>
+    </div>
+    <div id="cErr" class="err hidden"></div>
+    <button class="btn" style="margin-top:20px">Submit complaint</button>
+  </form>`;
+  let timer;
+  const suggest = () => { clearTimeout(timer); timer = setTimeout(async () => {
+    const t = $("#cT").value, d = $("#cD").value;
+    if ((t + d).length < 8) return $("#sg").classList.add("hidden");
+    const s = await api("/classify", {method: "POST", body: {title: t, description: d}});
+    $("#sg").innerHTML = `Suggested for this complaint<div class="tags">${tag("cat", s.category)}${tag("p-" + s.priority, s.priority + " priority")}</div>`;
+    $("#sg").classList.remove("hidden");
+  }, 350); };
+  $("#cT").oninput = suggest; $("#cD").oninput = suggest;
+  $("#cf").onsubmit = async e => {
+    e.preventDefault();
+    try {
+      await api("/complaints", {method: "POST", body: {title: $("#cT").value, description: $("#cD").value, location: $("#cL").value, category: $("#cC").value || null, priority: $("#cP").value || null}});
+      toast("Complaint submitted"); go("mine");
+    } catch (err) { $("#cErr").textContent = err.message; $("#cErr").classList.remove("hidden"); }
+  };
+}
+
+/* ---------- admin dashboard ---------- */
+async function dashboard() {
+  const s = await api("/stats");
+  const n = k => s.by_status[k] || 0;
+  const tiles = [["Total", s.total, "var(--lav)", "var(--lav-d)"], ["Open", n("Open"), "var(--butter)", "var(--butter-d)"],
+    ["In progress", n("Assigned") + n("In Progress"), "var(--sky)", "var(--sky-d)"], ["Resolved", n("Resolved") + n("Closed"), "var(--mint)", "var(--mint-d)"],
+    ["Avg. fix time", s.avg_resolution_hours == null ? "–" : s.avg_resolution_hours + " h", "var(--peach)", "var(--peach-d)"]];
+  const bars = (obj, color) => { const max = Math.max(1, ...Object.values(obj)); return Object.entries(obj).sort((a, b) => b[1] - a[1]).map(([k, v]) =>
+    `<div class="bar"><span>${esc(k)}</span><div><i style="width:${v / max * 100}%;background:${color}"></i></div><b>${v}</b></div>`).join("") || `<p class="sub">No data yet.</p>`; };
+  $("#main").innerHTML = `<h2>Dashboard</h2><p class="sub">A live view of every complaint on campus.</p>
+    <div class="grid tiles">${tiles.map(([l, v, bg, fg]) => `<div class="tile" style="background:${bg};color:${fg}"><b>${v}</b><small>${l}</small></div>`).join("")}</div>
+    <div class="grid two">
+      <div class="card"><h3>By category</h3>${bars(s.by_category, "var(--lav-d)")}</div>
+      <div class="card"><h3>By priority</h3>${bars(s.by_priority, "var(--peach-d)")}</div>
+      <div class="card"><h3>By status</h3>${bars(s.by_status, "var(--sky-d)")}</div>
+      <div class="card"><h3>Faculty workload</h3>${s.faculty_load.length ? bars(Object.fromEntries(s.faculty_load.map(f => [f.name, f.open])), "var(--mint-d)") : `<p class="sub">No active assignments.</p>`}</div>
+    </div>`;
+}
+
+/* ---------- detail drawer ---------- */
+async function openDrawer(id, refresh) {
+  const c = await api("/complaints/" + id);
+  const mine = user.role === "admin" || c.assigned_to_id === user.id;
+  let actions = "";
+  if (user.role === "admin") {
+    const fac = await api("/users?role=faculty");
+    actions += `<div class="card"><h3>Assign</h3>
+      <select id="aF">${fac.map(f => `<option value="${f.id}" ${f.id === c.assigned_to_id ? "selected" : ""}>${esc(f.name)}</option>`).join("")}</select>
+      <label for="aP">Priority</label><select id="aP">${meta.priorities.map(p => `<option ${p === c.priority ? "selected" : ""}>${p}</option>`).join("")}</select>
+      <button class="btn soft" id="doAssign" style="margin-top:12px">Save assignment</button></div>`;
+  }
+  if (mine && c.status !== "Closed") {
+    actions += `<div class="card"><h3>Update status</h3>
+      <select id="sS">${meta.statuses.filter(s => user.role === "admin" || s !== "Closed").map(s => `<option ${s === c.status ? "selected" : ""}>${s}</option>`).join("")}</select>
+      <input id="sN" placeholder="Add a note (optional)" style="margin-top:8px">
+      <button class="btn soft" id="doStatus" style="margin-top:12px">Update status</button></div>
+    <div class="card"><h3>Resolve</h3><textarea id="rT" placeholder="What was done to fix it?" style="min-height:80px"></textarea>
+      <button class="btn mint" id="doResolve" style="margin-top:12px">Mark as resolved</button></div>`;
+  }
+  $("#drawerHost").innerHTML = `<div class="scrim" id="scrim"><div class="drawer" role="dialog" aria-label="Complaint ${c.id}">
+    <button class="close" id="x" aria-label="Close">×</button>
+    <div class="tags" style="justify-content:flex-start">${tag("cat", c.category)}${tag("p-" + c.priority, c.priority)}${tag("s-" + c.status, c.status)}</div>
+    <h2>${esc(c.title)}</h2><p>${esc(c.description)}</p>
+    <dl class="kv"><dt>Complaint</dt><dd>#${c.id}</dd><dt>Location</dt><dd>${esc(c.location || "Not given")}</dd>
+      <dt>Filed by</dt><dd>${esc(c.created_by)} (${c.created_by_role})</dd><dt>Handled by</dt><dd>${esc(c.assigned_to || "Not assigned yet")}</dd>
+      <dt>Filed on</dt><dd>${fmt(c.created_at)}</dd>${c.resolution ? `<dt>Resolution</dt><dd>${esc(c.resolution)}</dd>` : ""}</dl>
+    <h3>Progress</h3><div class="timeline">${c.history.map(h => `<div><b>${esc(h.status)}</b> · ${fmt(h.at)}<br>${esc(h.note)}<br><span style="color:var(--mute)">${esc(h.by)}</span></div>`).join("")}</div>
+    <div class="actions">${actions}</div></div></div>`;
+  const close = () => { $("#drawerHost").innerHTML = ""; refresh && refresh(); if (view === "dash") dashboard(); };
+  $("#x").onclick = close; $("#scrim").onclick = e => e.target.id === "scrim" && close();
+  const act = (btn, fn, msg) => $(btn) && ($(btn).onclick = async () => { try { await fn(); toast(msg); await openDrawer(id, refresh); refresh && refresh(); } catch (e) { toast(e.message); } });
+  act("#doAssign", () => api(`/complaints/${id}/assign`, {method: "PATCH", body: {assignee_id: +$("#aF").value, priority: $("#aP").value}}), "Assignment saved");
+  act("#doStatus", () => api(`/complaints/${id}/status`, {method: "PATCH", body: {status: $("#sS").value, note: $("#sN").value}}), "Status updated");
+  act("#doResolve", () => api(`/complaints/${id}/resolve`, {method: "POST", body: {resolution: $("#rT").value}}), "Marked as resolved");
+}
+addEventListener("keydown", e => { if (e.key === "Escape" && $("#scrim")) $("#x").click(); });
+
+boot();
+</script>
+</body>
+</html>
